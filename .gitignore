@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv*/
+.env
+
+# macOS
+.DS_Store
+
+# Data & artifacts (DO NOT COMMIT)
+LIBERO/
+work/
+wandb/
+.cache/
+.hf_cache/
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.png
+*.jpg
+*.mp4
