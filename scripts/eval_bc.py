@@ -50,7 +50,7 @@ def main():
     if not pred_files:
         raise FileNotFoundError(f"No predictions found in {preds_dir}. Run predict_actions first.")
 
-    win = int(round(args.window-sec * args.fps)) if hasattr(args, "window-sec") else int(round(args.window_sec * args.fps))
+    win = int(round(args.window_sec * args.fps)) if hasattr(args, "window_sec") else int(round(args.window_sec * args.fps))
     # argparse hyphen bug workaround:
     win = int(round(args.window_sec * args.fps))
 

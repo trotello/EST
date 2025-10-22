@@ -46,6 +46,10 @@ def main():
     p.add_argument("--fps", type=float, default=12.0)
     p.add_argument("--fusion", choices=["simple","mlp"], default="simple")
     p.add_argument("--fusion-model-dir", default=None)
+    p.add_argument("--thr-pct", type=float, default=-1.0,
+               help="If >=0, use this percentile of the per-episode fused score as the threshold (e.g., 90).")
+    p.add_argument("--thr-pct-min", type=float, default=0.0,
+               help="Floor for the auto threshold, to avoid picking too-low values (e.g., 0.45).")
     args = p.parse_args()
 
     feat_dir = os.path.join(args.work_dir, "features", args.model_key)
@@ -115,7 +119,15 @@ def main():
 
         # post-process
         p_s = smooth_prob(p, kind="median", window=args.smooth_window)
-        cuts = pick_boundaries(p_s, thr=args.threshold, nms_win_frames=nms_win, min_duration_frames=min_dur)
+
+        if args.thr_pct is not None and args.thr_pct >= 0.0:
+            # auto threshold from this episode's score distribution
+            thre = float(np.percentile(p_s, args.thr_pct))
+            thre = max(thre, float(args.thr_pct_min))
+        else:
+            thre = float(args.threshold)
+
+        cuts = pick_boundaries(p_s, thr=thre, nms_win_frames=nms_win, min_duration_frames=min_dur)
         boundary_hard = np.zeros((T,), dtype=np.uint8)
         boundary_hard[cuts] = 1
         event_id, event_progress = ids_and_progress(T, cuts)
