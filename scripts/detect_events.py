@@ -25,6 +25,8 @@ from tqdm import tqdm
 from estlib.detect.gebd_runner import GebdRunner
 from estlib.models.fusion_head import fuse_simple
 from estlib.detect.postproc import smooth_prob, pick_boundaries, ids_and_progress
+from estlib.models.fusion_head import FusionMLP
+import torch
 
 def main():
     p = argparse.ArgumentParser()
@@ -42,6 +44,8 @@ def main():
     p.add_argument("--nms-win-sec", type=float, default=0.5)
     p.add_argument("--min-dur-sec", type=float, default=1.0)
     p.add_argument("--fps", type=float, default=12.0)
+    p.add_argument("--fusion", choices=["simple","mlp"], default="simple")
+    p.add_argument("--fusion-model-dir", default=None)
     args = p.parse_args()
 
     feat_dir = os.path.join(args.work_dir, "features", args.model_key)
@@ -49,6 +53,21 @@ def main():
     boc_dir  = os.path.join(args.work_dir, "bocpd",   args.model_key)
     out_dir  = os.path.join(args.work_dir, "events",  args.model_key)
     os.makedirs(out_dir, exist_ok=True)
+
+    fusion_model = None
+    if args.fusion == "mlp":
+        ck = torch.load(os.path.join(args.fusion_model_dir, "fusion_mlp.pt"), map_location="cpu")
+        fusion_model = FusionMLP(in_dim=ck["in_dim"], hidden=ck["hidden"])
+        fusion_model.load_state_dict(ck["state_dict"]); fusion_model.eval()
+
+    # inside per-episode loop, right after you have b (bocpd), e (error), and optional g (gebd):
+    if fusion_model is None:
+        p = fuse_simple(b_bocpd=b, e_raw=e, b_gebd=g, w_bocpd=args.w_bocpd, w_err=args.w_err, w_gebd=args.w_gebd)
+    else:
+        feats = [b, e] + ([g] if (g is not None) else [])
+        X = np.stack(feats, axis=1).astype("float32")  # [T,F]
+        with torch.no_grad():
+            p = fusion_model(torch.from_numpy(X)).numpy().astype("float32")
 
     # optional GEBD
     gebd = GebdRunner(

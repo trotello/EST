@@ -91,7 +91,8 @@ def load_model(model_dir: str, device: str = "cpu") -> tuple[ForwardModel, Forwa
         meta_dict = json.load(f)
     meta = ForwardMeta(**meta_dict)
     model = ForwardModel(d=meta.dim, hidden=meta.hidden, layers=meta.layers, residual=meta.residual)
-    model.load_state_dict(torch.load(os.path.join(model_dir, "forward_model.pt"), map_location=device))
+    model.load_state_dict(torch.load(os.path.join(model_dir, "forward_model.pt"), 
+                                    map_location=device))
     model.to(device).eval()
     normalizer = StatsNormalizer(np.array(meta.mean, dtype=np.float32),
                                  np.array(meta.std, dtype=np.float32))

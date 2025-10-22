@@ -4,9 +4,7 @@
 Quick diagnostic: plots fused score + hard boundaries for a few episodes.
 """
 from __future__ import annotations
-import argparse, glob, os
-import numpy as np
-import matplotlib.pyplot as plt
+import os, glob, numpy as np, h5py, argparse, matplotlib.pyplot as plt
 
 def main():
     p = argparse.ArgumentParser()
