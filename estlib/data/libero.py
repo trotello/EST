@@ -244,6 +244,7 @@ class EpisodeReader:
         crop_to: Optional[Tuple[int, int]] = None,
         default_src_fps_for_images: float = 30.0
     ):
+        print(target_fps)
         self.target_fps = float(target_fps)
         self.resize_short = int(resize_short) if resize_short else 0
         self.crop_to = crop_to

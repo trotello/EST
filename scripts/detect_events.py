@@ -61,13 +61,6 @@ def main():
         fusion_model.load_state_dict(ck["state_dict"]); fusion_model.eval()
 
     # inside per-episode loop, right after you have b (bocpd), e (error), and optional g (gebd):
-    if fusion_model is None:
-        p = fuse_simple(b_bocpd=b, e_raw=e, b_gebd=g, w_bocpd=args.w_bocpd, w_err=args.w_err, w_gebd=args.w_gebd)
-    else:
-        feats = [b, e] + ([g] if (g is not None) else [])
-        X = np.stack(feats, axis=1).astype("float32")  # [T,F]
-        with torch.no_grad():
-            p = fusion_model(torch.from_numpy(X)).numpy().astype("float32")
 
     # optional GEBD
     gebd = GebdRunner(
@@ -82,9 +75,11 @@ def main():
 
     nms_win = int(round(args.nms_win_sec * args.fps))
     min_dur = int(round(args.min_dur_sec * args.fps))
+    print("hey")
 
     for f in tqdm(feat_files, desc="detect_events"):
         base = os.path.splitext(os.path.basename(f))[0]          # ep_<...>
+        print(base, f)
         ep_id = base.replace("ep_", "")
 
         # load timestamps length from features (small array)
@@ -110,9 +105,13 @@ def main():
         if g is not None and len(g) != T:
             g = g[:T]
 
-        # fuse
-        p = fuse_simple(b_bocpd=b, e_raw=e, b_gebd=g,
-                        w_bocpd=args.w_bocpd, w_err=args.w_err, w_gebd=args.w_gebd)
+        if fusion_model is None:
+            p = fuse_simple(b_bocpd=b, e_raw=e, b_gebd=g, w_bocpd=args.w_bocpd, w_err=args.w_err, w_gebd=args.w_gebd)
+        else:
+            feats = [b, e] + ([g] if (g is not None) else [])
+            X = np.stack(feats, axis=1).astype("float32")  # [T,F]
+            with torch.no_grad():
+                p = fusion_model(torch.from_numpy(X)).numpy().astype("float32")
 
         # post-process
         p_s = smooth_prob(p, kind="median", window=args.smooth_window)
