@@ -11,6 +11,7 @@ from __future__ import annotations
 import os, glob
 import numpy as np
 import torch
+import json
 
 from estlib.il.model import PolicyMLP
 from estlib.data.libero_actions import read_actions_from_h5
@@ -24,19 +25,24 @@ def load_policy(policy_dir: str, device: str = "cpu") -> dict:
     if not os.path.isfile(ckpt_path):
         raise FileNotFoundError(ckpt_path)
     ckpt = torch.load(ckpt_path, map_location=device)
+
+    data = None
+    with open(os.path.join(policy_dir, "meta.json")) as json_file:
+        data = json.load(json_file)
+    print(list(ckpt.keys()))
     model = PolicyMLP(
-        in_dim=ckpt["input_dim"],
-        act_dim=ckpt["act_dim"],
-        hidden=ckpt["hidden"],
-        layers=ckpt["layers"],
+        in_dim=data["input_dim"],
+        act_dim=data["act_dim"],
+        hidden=data["hidden"],
+        layers=data["layers"],
     ).to(device)
-    model.load_state_dict(ckpt["state_dict"])
+    model.load_state_dict(ckpt)
     model.eval()
     return {
         "model": model,
-        "use_est": bool(ckpt["use_est"]),
-        "input_dim": int(ckpt["input_dim"]),
-        "act_dim": int(ckpt["act_dim"]),
+        "use_est": bool(data["use_est"]),
+        "input_dim": int(data["input_dim"]),
+        "act_dim": int(data["act_dim"]),
     }
 
 def build_inputs_for_episode(features_npz: str, events_npz: str | None, use_est: bool) -> dict:

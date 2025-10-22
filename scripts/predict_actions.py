@@ -32,7 +32,8 @@ def main():
     p.add_argument("--max-episodes", type=int, default=None)
     args = p.parse_args()
 
-    policy_dir = os.path.join(args.work_dir, "models", "policy", f"bc_{args.variant}_{args.model_key}")
+    policy_dir = os.path.join(args.work_dir, "models", "bc", f"{args.variant}", f"{args.model_key}")
+    print(policy_dir)
     info = load_policy(policy_dir, device=args.device)
     use_est = info["use_est"]
 
