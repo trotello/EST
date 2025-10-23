@@ -46,6 +46,7 @@ def main():
     p.add_argument("--fps", type=float, default=12.0)
     p.add_argument("--fusion", choices=["simple","mlp"], default="simple")
     p.add_argument("--fusion-model-dir", default=None)
+    p.add_argument("--topk", type=int, default=0)
     p.add_argument("--thr-pct", type=float, default=-1.0,
                help="If >=0, use this percentile of the per-episode fused score as the threshold (e.g., 90).")
     p.add_argument("--thr-pct-min", type=float, default=0.0,
@@ -128,6 +129,14 @@ def main():
             thre = float(args.threshold)
 
         cuts = pick_boundaries(p_s, thr=thre, nms_win_frames=nms_win, min_duration_frames=min_dur)
+
+        if args.topk and args.topk > 0 and len(cuts) > args.topk:
+            # keep peaks with largest scores
+            pk_scores = [(i, p_s[i]) for i in cuts]
+            pk_scores.sort(key=lambda x: x[1], reverse=True)
+            cuts = [i for i,_ in pk_scores[:args.topk]]
+            cuts.sort()
+
         boundary_hard = np.zeros((T,), dtype=np.uint8)
         boundary_hard[cuts] = 1
         event_id, event_progress = ids_and_progress(T, cuts)
