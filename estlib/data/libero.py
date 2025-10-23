@@ -3,7 +3,7 @@
 """
 Episode discovery + reading for LIBERO-style demos.
 
-This module is intentionally YAML-free. If you later add Hydra, the ctor args
+This module is intentionally YAML-free. If I later add Hydra, the ctor args
 map 1:1 to config fields (see "HYDRA NOTE" comments below).
 
 It supports three common on-disk layouts:
@@ -37,7 +37,6 @@ except Exception:
     h5py = None
 
 
-# ----------------------------- helpers ---------------------------------------
 
 
 _IMG_EXTS = (".png", ".jpg", ".jpeg", ".bmp", ".webp")
@@ -116,7 +115,7 @@ def _maybe_h5_image_key(h5: "h5py.File") -> Optional[str]:
     Try to discover an image dataset key in a LIBERO/robomimic-style file.
     We probe a few common paths and then fall back to the first HxWx3 or 3xHxW.
     """
-    # common candidates (adjust if your files differ)
+    #change later when I know what my files are
     candidates = [
         "observations/images/agentview_rgb",
         "observations/images/agentview",
@@ -138,9 +137,6 @@ def _maybe_h5_image_key(h5: "h5py.File") -> Optional[str]:
                 best = name
     h5.visititems(_walk)
     return best
-
-
-# --------------------------- public API --------------------------------------
 
 
 @dataclass
@@ -184,8 +180,6 @@ class EpisodeIndex:
             "length_frames": e.length_frames,
             "extra": e.extra or {},
         }
-
-    # ---- internals ----
 
     def _scan(self):
         base = os.path.join(self.root, self.split)
@@ -250,7 +244,6 @@ class EpisodeReader:
         self.crop_to = crop_to
         self.default_img_fps = float(default_src_fps_for_images)
 
-    # ---- public ----
 
     def load(self, info: EpisodeInfo) -> Dict[str, np.ndarray]:
         if info.storage == "video":
@@ -290,8 +283,6 @@ class EpisodeReader:
                 "crop_to": self.crop_to,
             }
         }
-
-    # ---- readers ----
 
     def _read_video(self, path: str) -> Tuple[np.ndarray, Optional[np.ndarray], float]:
         cap = cv2.VideoCapture(path)

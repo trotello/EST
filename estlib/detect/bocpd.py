@@ -89,7 +89,7 @@ def bocpd(e: np.ndarray, cfg: BOCPDConfig) -> np.ndarray:
     H = float(cfg.hazard)
     one_minus_H = 1.0 - H
 
-    # time step 0: predictive irrelevant; record cp_prob[0]=1 if you want a start-cut, else 0
+    # time step 0: predictive irrelevant; record cp_prob[0]=1 if want a start-cut, else 0
     cp_prob[0] = 0.0
 
     for t in range(1, T):

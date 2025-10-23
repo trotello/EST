@@ -3,7 +3,7 @@
 """
 Abstract feature extractor API.
 
-HYDRA NOTE: if you add Hydra later, ctor args (device, batch_size, normalize)
+HYDRA NOTE: if I add Hydra later, ctor args (device, batch_size, normalize)
 map 1:1 to config fields. For now, everything is passed as Python args.
 """
 

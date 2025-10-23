@@ -3,7 +3,7 @@
 """
 Signal fusion:
 - start with a label-free weighted sum after robust normalization
-- keep an optional tiny MLP stub for when you add timestamp clicks later
+- keep an optional tiny MLP stub for when we add timestamp clicks later
 """
 
 from __future__ import annotations

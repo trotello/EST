@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Lightweight video transforms used by EpisodeReader and (later) by feature extraction.
-Kept separate so you can reuse them in training pipelines.
+Kept separate to can reuse them in training pipelines.
 """
 
 from __future__ import annotations

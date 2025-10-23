@@ -1,7 +1,7 @@
 # estlib/features/dinov2_extractor.py
 # -*- coding: utf-8 -*-
 """
-DINOv2 extractor (stub). Enable when you want to compare to CLIP.
+DINOv2 extractor (stub). Enable when want to compare to CLIP.
 Requires: torch>=2, torchvision, and either timm or torch.hub for dinov2 weights.
 """
 

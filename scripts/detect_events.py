@@ -65,15 +65,14 @@ def main():
         fusion_model = FusionMLP(in_dim=ck["in_dim"], hidden=ck["hidden"])
         fusion_model.load_state_dict(ck["state_dict"]); fusion_model.eval()
 
-    # inside per-episode loop, right after you have b (bocpd), e (error), and optional g (gebd):
 
-    # optional GEBD
+    #optional GEBD
     gebd = GebdRunner(
         mode="load" if args.use_gebd else "off",
         score_dir=args.gebd_score_dir
     )
 
-    # iterate episodes by features (has timestamps T we may want)
+    #iterate episodes by features (has timestamps T we may want)
     feat_files = sorted(glob.glob(os.path.join(feat_dir, "ep_*.npz")))
     if not feat_files:
         raise FileNotFoundError(f"No feature files at {feat_dir}")
@@ -83,7 +82,7 @@ def main():
     print("hey")
 
     for f in tqdm(feat_files, desc="detect_events"):
-        base = os.path.splitext(os.path.basename(f))[0]          # ep_<...>
+        base = os.path.splitext(os.path.basename(f))[0]          #ep_<...>
         print(base, f)
         ep_id = base.replace("ep_", "")
 
@@ -96,7 +95,7 @@ def main():
         e_path  = os.path.join(err_dir,  f"{base}_err.npy")
         b_path  = os.path.join(boc_dir,  f"{base}_bocpd.npy")
         if not (os.path.isfile(e_path) and os.path.isfile(b_path)):
-            # skip episodes without both signals
+            #skip episodes without both signals
             continue
         e = np.load(e_path).astype("float32")
         b = np.load(b_path).astype("float32")
